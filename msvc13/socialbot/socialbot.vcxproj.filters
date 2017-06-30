@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{c299e3f1-8e63-42ad-bcd9-e7c8890630c0}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Source Files\sha1">
+      <UniqueIdentifier>{32d2729d-6e55-4013-aa80-a863f56eb976}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\socialbot\attribute.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\socialbot\autobuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\socialbot\sha1\SHA1.h">
+      <Filter>Source Files\sha1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\socialbot\sha1\HMAC_SHA1.h">
+      <Filter>Source Files\sha1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\socialbot\twitterbot.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\socialbot\githubbot.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\socialbot\attribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\autobuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\sha1\SHA1.cpp">
+      <Filter>Source Files\sha1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\sha1\HMAC_SHA1.cpp">
+      <Filter>Source Files\sha1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\twitterbot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\githubbot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

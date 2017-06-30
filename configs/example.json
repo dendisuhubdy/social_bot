@@ -1,0 +1,19 @@
+{
+  "github":{
+    "verbose":0,
+    "proxy":"proxy.server.com:5566",
+    "author":"sergeykhbr",
+    "repo_name":"some_repo_name",
+    "oauth_token":"773_github_generated_hash_4e29c1e67d4c9f"
+  },
+  "twitter":{
+     "verbose":0,
+     "proxy":"",
+     "username":"sergeykhbr",
+     "password":"your_twitter_password",
+     "oauth_consumer_key":"4nR91_Random_key_32HAxj9g",
+     "consumer_secret":"YFNWwzxXAFP_consumer_key_vfHdXrcfQayjS4",
+     "oauth_token":"429112233-hm1bTOKENTOKENTOKENTOKENTOKENr8Iot14",
+     "token_secret":"OrSECRETTOKEN4fwU7ySECRETTOKENU5tFHh"
+  }
+}
