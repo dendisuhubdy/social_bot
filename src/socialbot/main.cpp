@@ -38,14 +38,12 @@ int main( int argc, char* argv[] ) {
 
     curl_global_init(CURL_GLOBAL_ALL);
 
-    AttributeType &github = cfg["github"];
-    AttributeType &twitter = cfg["twitter"];
     AttributeType newcommits;
 
-#if 0
+#if 1
     printf("Requesting github commits:\n");
 
-    GithubGetCommits git(github, newcommits);
+    GithubGetCommits git(cfg["github"], newcommits);
     for (unsigned i = 0; i < newcommits.size(); i++) {
         AttributeType &commit = newcommits[i]["commit"];
         const char *author = commit["author"]["name"].to_string();
@@ -56,7 +54,9 @@ int main( int argc, char* argv[] ) {
 
 
     printf("Post twitter status:\n");
-    TwitterPostStatus tw(twitter , "GIT: test #5\n!!");
+    for (int i = 0; i < 3; i++) {
+        TwitterPostStatus tw(cfg["twitter"], "GIT: test #5\n!!");
+    }
 
     curl_global_cleanup();
     return 0;

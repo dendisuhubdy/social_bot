@@ -1,5 +1,7 @@
 #include "twitterbot.h"
 #include "sha1/HMAC_SHA1.h"
+#include <fstream>
+std::ofstream ostw("twitterbot.log");
 
 static const char *httpsTwitterStatus = "https://api.twitter.com/1.1/statuses/update.json";
 
@@ -7,10 +9,32 @@ extern int str2netstr(const char *inStr, char *outStr);
 extern std::string base64_encode(unsigned char const* bytes_to_encode,
                                   unsigned int in_len);
 
+static const char *type_info_names[] = {
+  "TEXT",
+  "HEADER_IN",    /* 1 */
+  "HEADER_OUT",   /* 2 */
+  "DATA_IN",      /* 3 */
+  "DATA_OUT",     /* 4 */
+  "SSL_DATA_IN",  /* 5 */
+  "SSL_DATA_OUT", /* 6 */
+};
+
+static void verbose_callback(CURL *handle,
+                           curl_infotype type,
+                           char *data,
+                           size_t size,
+                           void *userptr) {
+    char tstr[1024];
+    int tstr_sz = sprintf(tstr, "\n!!%d=%s:\n", type, type_info_names[type]);
+    ostw.write(tstr, tstr_sz);
+    ostw.write(data, size);
+}
+
 TwitterPostStatus::TwitterPostStatus(const AttributeType &cfg,
                                      const char *msg) {
-    memset(strTime_, 0, 1024);
-    memset(strNonce_, 0, 1024);
+    
+    memset(this, 0, sizeof(this));
+
     srand( (unsigned int)time( NULL ) ); // seed
     time_t tm1 = time(NULL);
     int tm2 = rand() % 1000;
@@ -19,16 +43,15 @@ TwitterPostStatus::TwitterPostStatus(const AttributeType &cfg,
     sprintf_s(strTime_, 1024, "%I64d", tm1);
     sprintf_s(strNonce_, 1024, "%I64d%x", tm1, tm2);
 
-    memset(strMsg_, 0, sizeof(strMsg_));
     str2netstr(msg, strMsg_);
 
     hCurl_ = curl_easy_init();
-    curl_easy_setopt(hCurl_, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(hCurl_, CURLOPT_USERAGENT, 0);
 
     //standard params:
     if (cfg["verbose"].to_int()) {
         curl_easy_setopt(hCurl_, CURLOPT_VERBOSE, 1L);
+        //curl_easy_setopt(hCurl_, CURLOPT_DEBUGFUNCTION, verbose_callback);
     }
     curl_easy_setopt(hCurl_, CURLOPT_CUSTOMREQUEST, NULL);
     curl_easy_setopt(hCurl_, CURLOPT_ENCODING, "");
@@ -147,6 +170,8 @@ void TwitterPostStatus::post(const AttributeType &cfg, const char *msg) {
     curl_easy_setopt(hCurl_, CURLOPT_POST, 1 );
     curl_easy_setopt(hCurl_, CURLOPT_URL, httpsTwitterStatus);
     curl_easy_setopt(hCurl_, CURLOPT_COPYPOSTFIELDS, bufPostMsg_);
+    curl_easy_setopt(hCurl_, CURLOPT_SSL_VERIFYPEER, 0);
+    //curl_easy_setopt(hCurl_, CURLOPT_SSL_VERIFYHOST, 0);
     if (curl_easy_perform(hCurl_) == CURLE_OK) {
         printf("OK: %s\n", strWebResponse);
     } else {
