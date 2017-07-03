@@ -15,5 +15,12 @@
      "consumer_secret":"YFNWwzxXAFP_consumer_key_vfHdXrcfQayjS4",
      "oauth_token":"429112233-hm1bTOKENTOKENTOKENTOKENTOKENr8Iot14",
      "token_secret":"OrSECRETTOKEN4fwU7ySECRETTOKENU5tFHh"
+  },
+  "telegram":{
+     "verbose":0,
+     "proxy":"",
+     "name":"your_name",
+     "BotName":"your_name_bot",
+     "token":"311229493:AAFma9f-t22DF-zxG7gAALCFFFFFFFFFFFF4"
   }
 }

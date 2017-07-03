@@ -28,6 +28,9 @@
     <ClInclude Include="..\..\src\socialbot\githubbot.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\socialbot\telegrambot.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\socialbot\attribute.cpp">
@@ -52,6 +55,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\socialbot\githubbot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\socialbot\telegrambot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

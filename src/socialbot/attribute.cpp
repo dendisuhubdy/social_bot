@@ -626,7 +626,7 @@ int string_to_attribute(const char *cfg, int &off,
     }
     /** Guard to skip wrong formatted string and avoid hanging: */
     if (off == checkstart) {
-        printf("JSON parser error: Can't detect format\n");
+        printf("JSON parser error: Can't detect format at %d\n", off);
         out->attr_free();
         return -1;
     }

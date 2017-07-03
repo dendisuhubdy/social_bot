@@ -1,15 +1,12 @@
-#include "githubbot.h"
+#include "telegrambot.h"
 #include <fstream>
-char jsonparse[1024*1024];
-int json_cnt;
 
-GithubGetCommits::GithubGetCommits(const AttributeType &cfg,
+TelegramPost::TelegramPost(const AttributeType &cfg,
                                    AttributeType &commits) {
-    json_cnt = 0;
     hCurl_ = curl_easy_init();
     curl_easy_setopt(hCurl_, CURLOPT_SSL_VERIFYPEER, 0);
     // must be set for github
-    curl_easy_setopt(hCurl_, CURLOPT_USERAGENT, "socialbot");
+    curl_easy_setopt(hCurl_, CURLOPT_USERAGENT, 0);
 
     //standard params:
     if (cfg["verbose"].to_int()) {
@@ -41,20 +38,19 @@ GithubGetCommits::GithubGetCommits(const AttributeType &cfg,
     sprintf(header_, "Authorization: token %s",
                     cfg["oauth_token"].to_string());
 
-    sprintf(httpsLink_, "https://api.github.com/repos/%s/%s/commits",
-        cfg["author"].to_string(),
-        cfg["repo_name"].to_string());
+    sprintf(httpsLink_, "https://api.telegram.org/bot%s/getme",
+        cfg["token"].to_string());
     get(cfg, commits);
     curl_easy_cleanup(hCurl_);
 }
 
-GithubGetCommits::~GithubGetCommits() {
+TelegramPost::~TelegramPost() {
     delete [] bufError_;
     delete [] bufPostMsg_;
 }
 
-int GithubGetCommits::callbackResponse(char* data, size_t size,
-                              size_t nmemb, GithubGetCommits *obj) {
+int TelegramPost::callbackResponse(char* data, size_t size,
+                              size_t nmemb, TelegramPost *obj) {
     if (obj && data) {
         size_t total = size * nmemb;
         return obj->writeWebResponse(data, total);
@@ -62,22 +58,19 @@ int GithubGetCommits::callbackResponse(char* data, size_t size,
     return 0;
 }
 
-int GithubGetCommits::writeWebResponse(char *buf, size_t sz) {
+int TelegramPost::writeWebResponse(char *buf, size_t sz) {
     memcpy(strWebResponse, buf, sz);
     strWebResponse[sz] = 0;
-    memcpy(&jsonparse[json_cnt], buf, sz);
-    json_cnt += sz;
-    jsonparse[json_cnt] = 0;
     return static_cast<int>(sz);
 }
 
 
-void GithubGetCommits::get(const AttributeType &cfg, AttributeType &commits) {
+void TelegramPost::get(const AttributeType &cfg, AttributeType &commits) {
     struct curl_slist* pOAuthHeaderList = NULL;
 
     pOAuthHeaderList = curl_slist_append( pOAuthHeaderList, header_);
     if (pOAuthHeaderList) {
-        curl_easy_setopt(hCurl_, CURLOPT_HTTPHEADER, pOAuthHeaderList);
+        //curl_easy_setopt(hCurl_, CURLOPT_HTTPHEADER, pOAuthHeaderList);
     }
 
     curl_easy_setopt(hCurl_, CURLOPT_HTTPGET, 1 );
@@ -85,7 +78,6 @@ void GithubGetCommits::get(const AttributeType &cfg, AttributeType &commits) {
 
     if (curl_easy_perform(hCurl_) == CURLE_OK) {
         printf("OK: %s\n", strWebResponse);
-        commits.from_config(jsonparse);
     } else {
         printf("Error: %s\n", bufError_);
     }

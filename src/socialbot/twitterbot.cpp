@@ -38,8 +38,9 @@ TwitterPostStatus::TwitterPostStatus(const AttributeType &cfg,
     srand( (unsigned int)time( NULL ) ); // seed
     time_t tm1 = time(NULL);
     int tm2 = rand() % 1000;
-    //tm1 = 1498741273ll;
-    //tm2 = 0x399;
+    //tm1 = 1499072346ll;
+    //tm2 = 0x2d2;
+
     sprintf_s(strTime_, 1024, "%I64d", tm1);
     sprintf_s(strNonce_, 1024, "%I64d%x", tm1, tm2);
 
@@ -114,6 +115,12 @@ void TwitterPostStatus::createOAuthSignature(const AttributeType &cfg,
     char netparams[1024];
     char base[2*1024];
     char secret[1024];
+    memset(params, 0, sizeof(params));
+    memset(neturl, 0, sizeof(neturl));
+    memset(netparams, 0, sizeof(netparams));
+    memset(base, 0, sizeof(base));
+    memset(secret, 0, sizeof(secret));
+
     sprintf(params, "oauth_consumer_key=%s&oauth_nonce=%s"
 		            "&oauth_signature_method=HMAC-SHA1&oauth_timestamp=%s"
 		            "&oauth_token=%s&oauth_version=1.0&status=%s",
