@@ -44,7 +44,9 @@ TwitterPostStatus::TwitterPostStatus(const AttributeType &cfg,
     sprintf_s(strTime_, 1024, "%I64d", tm1);
     sprintf_s(strNonce_, 1024, "%I64d%x", tm1, tm2);
 
-    str2netstr(msg, strMsg_);
+    char tmp_msg[1024];
+    sprintf(tmp_msg, "%s %s", cfg["message_marker"].to_string(), msg);
+    str2netstr(tmp_msg, strMsg_);
 
     hCurl_ = curl_easy_init();
     curl_easy_setopt(hCurl_, CURLOPT_USERAGENT, 0);

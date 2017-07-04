@@ -3,7 +3,13 @@
 #include "telegrambot.h"
 #include <fstream>
 
-#define HISTORY_FILENAME "history.json"
+#ifdef _DEBUG
+#ifdef WIN32
+#error "Select target Release. Debug doesn't include libcurl.lib file."
+#else
+#pragma error "Select target Release. Debug doesn't include libcurl.lib file."
+#endif
+#endif
 
 //libcurl.lib;ws2_32.lib;wldap32.lib;advapi32.lib;kernel32.lib;comdlg32.lib
 //curl_easy_setopt(curl_handle, CURLOPT_STDERR, my_file_stream)
@@ -60,7 +66,7 @@ int main( int argc, char* argv[] ) {
 
     AttributeType oldcommits, allcommits, newcommits;
 
-    readJsonFromFile(HISTORY_FILENAME, oldcommits);
+    readJsonFromFile(cfg["history"].to_string(), oldcommits);
     printf("Requesting github commits:\n");
     GithubGetCommits git(cfg["github"], allcommits);
 
@@ -90,12 +96,12 @@ int main( int argc, char* argv[] ) {
         //oldest_idx = static_cast<int>(newcommits.size() - 1);
         oldest_idx = 0;
     }
-    printf("Posting to twitter . . . %d commtis\n", oldest_idx + 1);
+    printf("Posting to twitter . . . %d commits\n", oldest_idx + 1);
     for (int i = oldest_idx; i >= 0; i--) {
         TwitterPostStatus tw(cfg["twitter"], newcommits[i].to_string());
     }
 
-    writeJsonToFile(HISTORY_FILENAME, allcommits);
+    writeJsonToFile(cfg["history"].to_string(), allcommits);
 
     curl_global_cleanup();
     return 0;

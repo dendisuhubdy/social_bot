@@ -390,9 +390,9 @@ void attribute_to_string(const AttributeType *attr, AutoBuffer *buf) {
     } else if (attr->is_int64() || attr->is_uint64()) {
         buf->write_uint64(attr->to_uint64());
     } else if (attr->is_string()) {
-        buf->write_string('\'');
+        buf->write_string('"');
         buf->write_string(attr->to_string());
-        buf->write_string('\'');
+        buf->write_string('"');
     } else if (attr->is_bool()) {
         if (attr->to_bool()) {
             buf->write_string("true");
@@ -417,9 +417,9 @@ void attribute_to_string(const AttributeType *attr, AutoBuffer *buf) {
         buf->write_string('{');
 
         for (unsigned i = 0; i < dict_sz; i++) {
-            buf->write_string('\'');
+            buf->write_string('"');
             buf->write_string(attr->u_.dict[i].key_.to_string());
-            buf->write_string('\'');
+            buf->write_string('"');
             buf->write_string(':');
             const AttributeType &dict_value = (*attr)[i];
             attribute_to_string(&dict_value, buf);
