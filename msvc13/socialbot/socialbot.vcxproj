@@ -165,6 +165,7 @@
     <ClInclude Include="..\..\src\socialbot\sha1\SHA1.h" />
     <ClInclude Include="..\..\src\socialbot\telegrambot.h" />
     <ClInclude Include="..\..\src\socialbot\twitterbot.h" />
+    <ClInclude Include="..\..\src\socialbot\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

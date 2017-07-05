@@ -1,8 +1,9 @@
 #include "telegrambot.h"
+#include "utils.h"
 #include <fstream>
 
 TelegramPost::TelegramPost(const AttributeType &cfg,
-                                   AttributeType &commits) {
+                           const char *msg) {
     hCurl_ = curl_easy_init();
     curl_easy_setopt(hCurl_, CURLOPT_SSL_VERIFYPEER, 0);
     // must be set for github
@@ -38,9 +39,21 @@ TelegramPost::TelegramPost(const AttributeType &cfg,
     sprintf(header_, "Authorization: token %s",
                     cfg["oauth_token"].to_string());
 
+#if 1
+    sprintf(httpsLink_, "https://api.telegram.org/bot%s/sendMessage",
+        cfg["token"].to_string());
+
+    str2netstr(msg, strMsg_);
+    sprintf(bufPostMsg_, "chat_id=@%s&text=%s",
+        cfg["chat_id"].to_string(),
+        strMsg_);
+
+    postToChannel();
+#else
     sprintf(httpsLink_, "https://api.telegram.org/bot%s/getme",
         cfg["token"].to_string());
-    get(cfg, commits);
+    postToChannel(cfg, commit);
+#endif
     curl_easy_cleanup(hCurl_);
 }
 
@@ -65,23 +78,14 @@ int TelegramPost::writeWebResponse(char *buf, size_t sz) {
 }
 
 
-void TelegramPost::get(const AttributeType &cfg, AttributeType &commits) {
-    struct curl_slist* pOAuthHeaderList = NULL;
-
-    pOAuthHeaderList = curl_slist_append( pOAuthHeaderList, header_);
-    if (pOAuthHeaderList) {
-        //curl_easy_setopt(hCurl_, CURLOPT_HTTPHEADER, pOAuthHeaderList);
-    }
-
-    curl_easy_setopt(hCurl_, CURLOPT_HTTPGET, 1 );
+void TelegramPost::postToChannel() {
+    curl_easy_setopt(hCurl_, CURLOPT_HTTPPOST, 1 );
     curl_easy_setopt(hCurl_, CURLOPT_URL, httpsLink_);
+    curl_easy_setopt(hCurl_, CURLOPT_COPYPOSTFIELDS, bufPostMsg_);
 
     if (curl_easy_perform(hCurl_) == CURLE_OK) {
         printf("OK: %s\n", strWebResponse);
     } else {
         printf("Error: %s\n", bufError_);
-    }
-    if (pOAuthHeaderList) {
-        curl_slist_free_all(pOAuthHeaderList);
     }
 }

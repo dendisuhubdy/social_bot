@@ -1,4 +1,9 @@
 #include <string>
+#include "utils.h"
+#include <iostream>
+#include <time.h>
+
+static FILE *logfile_ = 0;
 
 static void char2hex(char dec, char *outStr) {
 	char dig1 = (dec&0xF0)>>4;
@@ -156,4 +161,48 @@ std::string base64_decode(std::string const& encoded_string) {
   }
 
   return ret;
+}
+
+// Get current date/time, format is YYYY-MM-DD.HH:mm:ss
+const std::string currentDateTime() {
+    time_t     now = time(0);
+    struct tm  tstruct;
+    char       buf[80];
+    tstruct = *localtime(&now);
+    // Visit http://en.cppreference.com/w/cpp/chrono/c/strftime
+    // for more information about date/time format
+    strftime(buf, sizeof(buf), "%Y-%m-%d.%X", &tstruct);
+    return buf;
+}
+
+void LOG_create(const char *filename) {
+    logfile_ = fopen(filename, "a");
+}
+
+int LOG_printf(const char *fmt, ...) {
+    int ret;
+    va_list arg;
+    char bufLog[1024];
+    va_start(arg, fmt);
+#if defined(_WIN32) || defined(__CYGWIN__)
+    ret = vsprintf_s(bufLog, sizeof(bufLog), fmt, arg);
+#else
+    ret = vsprintf(bufLog, fmt, arg);
+#endif
+    va_end(arg);
+
+    bufLog[ret++] = '\n';
+    bufLog[ret] = '\0';
+    printf("%s", bufLog);
+    if (logfile_) {
+        fwrite(bufLog, ret, 1, logfile_);
+        fflush(logfile_);
+    }
+    return ret;
+}
+
+void LOG_close() {
+    if (logfile_) {
+        fclose(logfile_);
+    }
 }

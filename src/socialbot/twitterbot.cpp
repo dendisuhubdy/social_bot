@@ -1,34 +1,9 @@
 #include "twitterbot.h"
+#include "utils.h"
 #include "sha1/HMAC_SHA1.h"
 #include <fstream>
-std::ofstream ostw("twitterbot.log");
 
 static const char *httpsTwitterStatus = "https://api.twitter.com/1.1/statuses/update.json";
-
-extern int str2netstr(const char *inStr, char *outStr);
-extern std::string base64_encode(unsigned char const* bytes_to_encode,
-                                  unsigned int in_len);
-
-static const char *type_info_names[] = {
-  "TEXT",
-  "HEADER_IN",    /* 1 */
-  "HEADER_OUT",   /* 2 */
-  "DATA_IN",      /* 3 */
-  "DATA_OUT",     /* 4 */
-  "SSL_DATA_IN",  /* 5 */
-  "SSL_DATA_OUT", /* 6 */
-};
-
-static void verbose_callback(CURL *handle,
-                           curl_infotype type,
-                           char *data,
-                           size_t size,
-                           void *userptr) {
-    char tstr[1024];
-    int tstr_sz = sprintf(tstr, "\n!!%d=%s:\n", type, type_info_names[type]);
-    ostw.write(tstr, tstr_sz);
-    ostw.write(data, size);
-}
 
 TwitterPostStatus::TwitterPostStatus(const AttributeType &cfg,
                                      const char *msg) {
@@ -54,7 +29,6 @@ TwitterPostStatus::TwitterPostStatus(const AttributeType &cfg,
     //standard params:
     if (cfg["verbose"].to_int()) {
         curl_easy_setopt(hCurl_, CURLOPT_VERBOSE, 1L);
-        //curl_easy_setopt(hCurl_, CURLOPT_DEBUGFUNCTION, verbose_callback);
     }
     curl_easy_setopt(hCurl_, CURLOPT_CUSTOMREQUEST, NULL);
     curl_easy_setopt(hCurl_, CURLOPT_ENCODING, "");

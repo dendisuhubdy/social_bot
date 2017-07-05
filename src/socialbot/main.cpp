@@ -1,6 +1,7 @@
 #include "twitterbot.h"
 #include "githubbot.h"
 #include "telegrambot.h"
+#include "utils.h"
 #include <fstream>
 
 #ifdef _DEBUG
@@ -49,6 +50,40 @@ void writeJsonToFile(const char *filename, AttributeType &in) {
     offile.write(wrbuf, strlen(wrbuf) + 1);
 }
 
+void commits2shortmsg(AttributeType &commits, AttributeType &shortmsg) {
+    int last = static_cast<int>(commits.size()) - 1;
+    const char *pstart;
+    int len;
+    char tstr[1024];
+    int short_cnt = 0;
+    for (int i = last; i >= 0; i--) {
+        pstart = commits[i].to_string();
+        LOG_printf("Processing commit: \"%s\"", pstart);
+        len = 0;
+        tstr[0] = 0;
+        while (pstart[len]) {
+            if (pstart[len] == '\\' && pstart[len + 1] == 'n') {
+                pstart = &pstart[len + 2];
+
+                AttributeType t1;
+                t1.make_string(tstr);
+                shortmsg.add_to_list(&t1);
+                LOG_printf("    {%d} \"%s\"", short_cnt++, tstr);
+                tstr[len = 0] = '\0';
+            } else {
+                tstr[len] = pstart[len];
+                tstr[++len] = '\0';
+            }
+        }
+        if (len) {
+            AttributeType t1;
+            t1.make_string(tstr);
+            shortmsg.add_to_list(&t1);
+            LOG_printf("    {%d} \"%s\"", short_cnt++, tstr);
+        }
+    }
+}
+
 int main( int argc, char* argv[] ) {
     if (argc != 2) {
         printf("Specify confugration file:\n");
@@ -62,6 +97,8 @@ int main( int argc, char* argv[] ) {
         printf("Wrong configuration format\n");
         return -1;
     }
+    LOG_create(cfg["log_file"].to_string());
+    LOG_printf("[%s]", currentDateTime().c_str());
     curl_global_init(CURL_GLOBAL_ALL);
 
     AttributeType oldcommits, allcommits, newcommits;
@@ -77,6 +114,22 @@ int main( int argc, char* argv[] ) {
 
     if (oldcommits.is_list() && oldcommits.size()) {
         newcommits.make_list(0);
+        bool found = false;
+        for (unsigned i = 0; i < allcommits.size(); i++) {
+            const AttributeType &sha = allcommits[i]["sha"];
+            for (unsigned n = 0; n < oldcommits.size(); n++) {
+                if (oldcommits[n]["sha"].is_equal(sha.to_string())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                newcommits.add_to_list(&allcommits[i]["message"]);
+            } else {
+                break;
+            }
+        }
     } else {
         newcommits.make_list(allcommits.size());
         for (unsigned i = 0; i < allcommits.size(); i++) {
@@ -84,25 +137,31 @@ int main( int argc, char* argv[] ) {
             newcommits[i] = commit["message"];
         }
     }
-    printf("Total number of new commits . . . %d\n", newcommits.size());
-
-
-    printf("Posting to telegram:\n");
-    AttributeType x1;
-    TelegramPost telegram(cfg["telegram"], x1);
-
     int oldest_idx = -1;
+    AttributeType shortmsg(Attr_List);
     if (newcommits.size()) {
-        //oldest_idx = static_cast<int>(newcommits.size() - 1);
-        oldest_idx = 0;
+        commits2shortmsg(newcommits, shortmsg);
     }
-    printf("Posting to twitter . . . %d commits\n", oldest_idx + 1);
-    for (int i = oldest_idx; i >= 0; i--) {
-        TwitterPostStatus tw(cfg["twitter"], newcommits[i].to_string());
+
+    LOG_printf("Total number of new commits . . . . %d", newcommits.size());
+    LOG_printf("Total number of new short message . %d", shortmsg.size());
+
+    const char *commit_msg;
+    LOG_printf("%s", "Posting to telegram:");
+    for (unsigned i = 0; i < shortmsg.size(); i++) {
+        commit_msg = shortmsg[i].to_string();
+        TelegramPost telegram(cfg["telegram"], commit_msg);
+    }
+
+    LOG_printf("%s", "Posting to twitter:");
+    for (unsigned i = 0; i < shortmsg.size(); i++) {
+        commit_msg = shortmsg[i].to_string();
+        TwitterPostStatus tw(cfg["twitter"], commit_msg);
     }
 
     writeJsonToFile(cfg["history"].to_string(), allcommits);
 
     curl_global_cleanup();
+    LOG_close();
     return 0;
 }
