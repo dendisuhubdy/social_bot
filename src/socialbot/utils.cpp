@@ -38,7 +38,7 @@ int str2netstr(const char *inStr, char *outStr) {
             len += 3;
 		}
 	}
-    outStr[len] = 0;
+    *outStr = 0;
 	return len;
 }
 

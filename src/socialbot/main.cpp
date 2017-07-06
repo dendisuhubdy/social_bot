@@ -154,9 +154,42 @@ int main( int argc, char* argv[] ) {
     }
 
     LOG_printf("%s", "Posting to twitter:");
+    char tstr1[256], tstr2[256];
+    int msglen;
+    int twittot;
     for (unsigned i = 0; i < shortmsg.size(); i++) {
         commit_msg = shortmsg[i].to_string();
-        TwitterPostStatus tw(cfg["twitter"], commit_msg);
+        msglen = static_cast<int>(strlen(commit_msg));
+        twittot = msglen / 110 + 1;
+        if (twittot > 1) { // 140 - "riscv_vhdl: (1 of 3)..." + n reserved
+            AttributeType splitlst(Attr_List), t1;
+            LOG_printf("Splitting twit %s:", commit_msg);
+            for (int n = 0; n < twittot; n++) {
+                if (msglen > 110) {
+                    memcpy(tstr1, &commit_msg[110 * n], 110);
+                    tstr1[110] = '\0';
+                    msglen -= 110;
+                } else {
+                    memcpy(tstr1, &commit_msg[110 * n], msglen);
+                    tstr1[msglen] = '\0';
+                    msglen = 0;
+                }
+                if (msglen != 0) {
+                    sprintf(tstr2, "(%d of %d) %s...", n + 1, twittot, tstr1);
+                } else {
+                    sprintf(tstr2, "(%d of %d) %s", n + 1, twittot, tstr1);
+                }
+                t1.make_string(tstr2);
+                splitlst.add_to_list(&t1);
+            }
+            for (unsigned n = splitlst.size(); n > 0; n--) {
+                LOG_printf("   %s", splitlst[n - 1].to_string());
+                TwitterPostStatus tw(cfg["twitter"],
+                                     splitlst[n - 1].to_string());
+            }
+        } else {
+            TwitterPostStatus tw(cfg["twitter"], commit_msg);
+        }
     }
 
     writeJsonToFile(cfg["history"].to_string(), allcommits);

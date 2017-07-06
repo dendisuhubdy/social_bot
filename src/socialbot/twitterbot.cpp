@@ -19,7 +19,7 @@ TwitterPostStatus::TwitterPostStatus(const AttributeType &cfg,
     sprintf_s(strTime_, 1024, "%I64d", tm1);
     sprintf_s(strNonce_, 1024, "%I64d%x", tm1, tm2);
 
-    char tmp_msg[1024];
+    char tmp_msg[1024] = {0};
     sprintf(tmp_msg, "%s %s", cfg["message_marker"].to_string(), msg);
     str2netstr(tmp_msg, strMsg_);
 
