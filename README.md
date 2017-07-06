@@ -8,7 +8,7 @@ It's a simple C++ program to translate github commits into social networks posts
 
 ## Example
 
-You can find results of working of this bot in Twitter with hashtag **#riscv_vhdl**.
+You can find results of working of this bot in Twitter with hashtag **#riscv_vhdl**.  
 Or you can join to Telegram's public channel **riscv_vhdl**.
 
 ## How to setup
@@ -20,22 +20,22 @@ This program will be cross-platform soon, but for now MS Visual Studio is used t
 
 Everytime *socialbot.exe* must be started with one argument - configuration
 file containing information about your accounts. Edit *configs/example.json* file
-using hte following tips:
+using the following tips:
 
   - Generate github token and write the following field:  
-    **Config["github"]["author"]**.  
-    **Config["github"]["repo_name"]**.  
-    **Config["github"]["oauth_token"]**.
+    **Config["github"]["author"]**. - github account login  
+    **Config["github"]["repo_name"]**. - github repository name to track commits  
+    **Config["github"]["oauth_token"]** - github application token.
   - Generate Twitter OAuth keys and token and edit the following fields:  
-     **Config["twitter"]["username"],**  
-     **Config["twitter"]["password"],**  
-     **Config["twitter"]["oauth_consumer_key"],**  
-     **Config["twitter"]["consumer_secret"],**  
-     **Config["twitter"]["oauth_token"],**  
-     **Config["twitter"]["token_secret"].
+     **Config["twitter"]["username"],** - Twitter account login  
+     **Config["twitter"]["password"],** - Twitter account password  
+     **Config["twitter"]["oauth_consumer_key"],** - Twitter generated data for developers  
+     **Config["twitter"]["consumer_secret"],** - Twitter generated data for developers  
+     **Config["twitter"]["oauth_token"],** - Twitter generated data for developers  
+     **Config["twitter"]["token_secret"]** - Twitter generated data for developers.
   - Create Telegram bot and edit the following fields:  
-     **Config["telegram"]["token"]**  
-     **Config["telegram"]["chat_id"]
+     **Config["telegram"]["token"]** - Telegram's bot token ID assigning on the bot creation.  
+     **Config["telegram"]["chat_id"]** - Your Telegram's channel ID
 
 ## Start bot
 
